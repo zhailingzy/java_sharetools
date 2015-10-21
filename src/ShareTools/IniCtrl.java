@@ -12,11 +12,11 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Properties;
 
-public class jIniCtrl {
+public class IniCtrl {
 	private static Properties p;
 	private String inifile;
 
-	public jIniCtrl(String inipath, Properties defaultpro) throws FileNotFoundException, IOException {
+	public IniCtrl(String inipath, Properties defaultpro) throws FileNotFoundException, IOException {
 
 		if (!Files.isReadable(Paths.get(inipath))) {
 			Files.createFile(Paths.get(inipath));
