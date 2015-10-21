@@ -5,7 +5,6 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-
 import javax.swing.JOptionPane;
 
 public class SqlOperator {
@@ -14,14 +13,14 @@ public class SqlOperator {
 	};
 
 	private String s_errTitle = "Sql Operator Error";
-
 	private Connection conn;
 	private Statement mystatement;
 	private String connstr;
 	private MessageBox msgBox;
 	private boolean showError;
 
-	public SqlOperator(dbtype dbtype, String connecturl, boolean showError) throws ClassNotFoundException, SQLException {
+	public SqlOperator(dbtype dbtype, String connecturl, boolean showError)
+			throws ClassNotFoundException, SQLException {
 		// TODO Auto-generated constructor stub
 		msgBox = new MessageBox();
 		this.showError = showError;
@@ -61,6 +60,7 @@ public class SqlOperator {
 			super.finalize();
 		} catch (Throwable e) {
 			// TODO Auto-generated catch block
+			disConnect();// disconnect anyway...
 			e.printStackTrace();
 			if (showError)
 				msgBox.showMessage(s_errTitle, e.getMessage(), JOptionPane.ERROR_MESSAGE);
@@ -69,42 +69,44 @@ public class SqlOperator {
 		disConnect();
 	}
 
-	public void openConnection() throws SQLException  {
+	public void openConnection() throws SQLException {
 		disConnect();
 		try {
 			conn = DriverManager.getConnection(connstr);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
+			disConnect();
 			e.printStackTrace();
 			if (showError)
 				msgBox.showMessage(s_errTitle, e.getMessage(), JOptionPane.ERROR_MESSAGE);
 			throw e;
 		}
-
 		try {
 			mystatement = conn.createStatement();
 		} catch (SQLException e) {
+			disConnect();
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			if (showError)
 				msgBox.showMessage(s_errTitle, e.getMessage(), JOptionPane.ERROR_MESSAGE);
 			throw e;
 		}
-
 	}
 
-	public void disConnect() throws SQLException {
+	public void disConnect() {
 		if (mystatement != null)
 			try {
 				mystatement.close();
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
 				if (conn != null)
-					conn.close();// close anyway....
+					try {
+						conn.close();
+					} catch (SQLException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} // close anyway....
 				e.printStackTrace();
-				if (showError)
-					msgBox.showMessage(s_errTitle, e.getMessage(), JOptionPane.ERROR_MESSAGE);
-				throw e;
 			}
 		if (conn != null)
 			try {
@@ -112,14 +114,12 @@ public class SqlOperator {
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-				if (showError)
-					msgBox.showMessage(s_errTitle, e.getMessage(), JOptionPane.ERROR_MESSAGE);
-				throw e;
 			}
 	}
 
-	public ResultSet executeQuery(String sql) throws SQLException  {
-
+	public ResultSet executeQuery(String sql) throws SQLException {
+		if (!isConnected())
+			openConnection();
 		try {
 			return mystatement.executeQuery(sql);
 		} catch (SQLException e) {
@@ -131,7 +131,9 @@ public class SqlOperator {
 		}
 	}
 
-	public int executeUpdate(String sql) throws SQLException  {
+	public int executeUpdate(String sql) throws SQLException {
+		if (!isConnected())
+			openConnection();
 		try {
 			return mystatement.executeUpdate(sql);
 		} catch (SQLException e) {
@@ -143,7 +145,7 @@ public class SqlOperator {
 		}
 	}
 
-	public int getMaxRows() throws SQLException  {
+	public int getMaxRows() throws SQLException {
 		try {
 			return mystatement.getMaxRows();
 		} catch (SQLException e) {
@@ -155,7 +157,7 @@ public class SqlOperator {
 		}
 	}
 
-	public void setMaxRows(int max) throws SQLException  {
+	public void setMaxRows(int max) throws SQLException {
 		try {
 			mystatement.setMaxRows(max);
 		} catch (SQLException e) {
@@ -167,4 +169,7 @@ public class SqlOperator {
 		}
 	}
 
+	public boolean isConnected() throws SQLException {
+		return !mystatement.isClosed() && conn.isValid(10);
+	}
 }
