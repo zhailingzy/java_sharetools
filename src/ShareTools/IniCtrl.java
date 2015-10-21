@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 import java.util.Properties;
 import javax.swing.JOptionPane;
 
+
 public class IniCtrl {
 	private static Properties p;
 	private String inifile;
