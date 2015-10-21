@@ -14,7 +14,6 @@ public class IniCtrl {
 	private MessageBox msgBox;
 	private String s_errTitle = "INI Control Error";
 	private boolean showError;
-
 	public IniCtrl(String inipath, Properties defaultpro, boolean showError) throws IOException {
 		msgBox = new MessageBox();
 		this.showError = showError;
