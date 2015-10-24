@@ -1,4 +1,4 @@
-package ShareTools;
+package shareTools;
 
 import java.awt.Container;
 import javax.swing.JDialog;

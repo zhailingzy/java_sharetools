@@ -1,4 +1,4 @@
-package ShareTools;
+package shareTools;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;

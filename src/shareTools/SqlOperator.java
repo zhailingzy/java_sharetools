@@ -1,4 +1,4 @@
-package ShareTools;
+package shareTools;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
